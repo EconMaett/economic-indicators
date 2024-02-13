@@ -2046,10 +2046,7 @@ estimation/forecast <sup>‡</sup> 2023 <sup>§</sup> 2022
 <a href="https://www.economist.com/economic-and-financial-indicators/2024/02/08/economic-data-commodities-and-markets">‘The
 Economist’</a> using only free tools. Economic data is retrieved from
 <a href="https://db.nomics.world/" target="_blank">DBnomics</a>.</p>
-<pre class="r"><code># if (!&quot;pacman&quot; %in% install.packages()[, &quot;Package&quot;]) { install.packages(&quot;pacman&quot;, repos = &quot;http://cran.r-project.org&quot;) }
-pkgs &lt;- c(&quot;tidyverse&quot;, &quot;rdbnomics&quot;, &quot;zoo&quot;, &quot;knitr&quot;, &quot;kableExtra&quot;, &quot;formattable&quot;)
-# pak::pkg_install(pkg = pkgs, ask = FALSE)
-pacman::p_load(tidyverse, rdbnomics, zoo, knitr, kableExtra, formattable)
+<pre class="r"><code>pacman::p_load(tidyverse, rdbnomics, zoo, knitr, kableExtra, formattable)
 
 opts_chunk$set(fig.align = &quot;center&quot;, message = FALSE, warning = FALSE)
 
@@ -2070,29 +2067,16 @@ country_list &lt;- c(
 <div id="download" class="section level1">
 <h1>Download</h1>
 <pre class="r"><code>## GDP ----
-gdp &lt;- rdb(
-  provider_code = &quot;OECD&quot;, 
-  dataset_code  = &quot;MEI&quot;, 
-  ids = &quot;.NAEXKP01.GPSA+GYSA.Q&quot;
-)
+gdp &lt;- rdb(provider_code = &quot;OECD&quot;, dataset_code  = &quot;MEI&quot;, ids = &quot;.NAEXKP01.GPSA+GYSA.Q&quot;)
 
-gdp_level_hk_ph_th_sa_sg &lt;- rdb(
-  provider_code = &quot;IMF&quot;,
-  dataset_code  = &quot;IFS&quot;,
-  mask = &quot;Q.HK+PH+TH+SA+SG.NGDP_R_SA_XDC&quot;
-  ) |&gt; 
+gdp_level_hk_ph_th_sa_sg &lt;- rdb(&quot;IMF&quot;, &quot;IFS&quot;, mask = &quot;Q.HK+PH+TH+SA+SG.NGDP_R_SA_XDC&quot;) |&gt; 
   rename(Country = `Reference Area`) |&gt; 
-  mutate(
-    Country = case_when(Country == &quot;Hong Kong, China&quot; ~ &quot;Hong Kong&quot;, TRUE ~ Country)
-  )
+  mutate(Country = case_when(Country == &quot;Hong Kong, China&quot; ~ &quot;Hong Kong&quot;, TRUE ~ Country))
 
 gdp_qoq_hk_ph_th_sa_sg &lt;- gdp_level_hk_ph_th_sa_sg |&gt; 
   arrange(Country, period) |&gt; 
   group_by(Country) |&gt; 
-  mutate(
-    value = (value / lag(value) - 1) * 100,
-    MEASURE = &quot;GPSA&quot;
-  )
+  mutate(value = (value / lag(value) - 1) * 100, MEASURE = &quot;GPSA&quot;)
 
 gdp_yoy_hk_ph_th_sa_sg &lt;- gdp_level_hk_ph_th_sa_sg |&gt; 
   arrange(Country, period) |&gt; 
@@ -2106,11 +2090,7 @@ gdp_my &lt;- rdb(ids = &quot;BI/TABEL9_1/21.Q&quot;) |&gt;
 gdp_tw &lt;- rdb(ids = &quot;BI/TABEL9_1/17.Q&quot;) |&gt; 
   mutate(Country = &quot;Taiwan&quot;, MEASURE = &quot;GYSA&quot;)
 
-gdp_eg_pk_pe &lt;- rdb(
-  provider_code = &quot;IMF&quot;, 
-  dataset_code  = &quot;WEO:latest&quot;, 
-  mask = &quot;EGY+PAK+PER.NGDP_RPCH&quot;
-  ) |&gt; 
+gdp_eg_pk_pe &lt;- rdb(&quot;IMF&quot;, &quot;WEO:latest&quot;, mask = &quot;EGY+PAK+PER.NGDP_RPCH&quot;) |&gt; 
   rename(Country = `WEO Country`) |&gt; 
   mutate(MEASURE = &quot;GYSA&quot;) |&gt; 
   filter(year(period) &lt; current_year)
@@ -2140,41 +2120,19 @@ gdp &lt;- bind_rows(
 )
 
 ## Industrial Production ----
-indprod &lt;- rdb(
-  provider_code = &quot;OECD&quot;,
-  dataset_code  = &quot;MEI&quot;,
-  ids = &quot;.PRINTO01.GYSA.M&quot;
-)
+indprod &lt;- rdb(&quot;OECD&quot;, &quot;MEI&quot;, &quot;.PRINTO01.GYSA.M&quot;)
 
-indprod_ch_au &lt;- rdb(
-  provider_code = &quot;OECD&quot;,
-  dataset_code  = &quot;MEI&quot;,
-  ids = &quot;AUS+CHE.PRINTO01.GYSA.Q&quot;
-  )
+indprod_ch_au &lt;- rdb(&quot;OECD&quot;, &quot;MEI&quot;, &quot;AUS+CHE.PRINTO01.GYSA.Q&quot;)
 
-indprod_cn_eg_mx_my &lt;- rdb(
-  provider_code = &quot;IMF&quot;,
-  dataset_code  = &quot;IFS&quot;,
-  mask = &quot;M.CN+EG+MX+MY.AIP_PC_CP_A_PT&quot;
-  ) |&gt; 
+indprod_cn_eg_mx_my &lt;- rdb(&quot;IMF&quot;, &quot;IFS&quot;, mask = &quot;M.CN+EG+MX+MY.AIP_PC_CP_A_PT&quot;) |&gt; 
   rename(Country = `Reference Area`)
 
-indprod_id_pk_pe_ph_sg_za &lt;- rdb(
-  provider_code = &quot;IMF&quot;,
-  dataset_code  = &quot;IFS&quot;,
-  mask = &quot;M.ID+PK+PE+PH+SG+ZH.AIPMA_PC_CP_A_PT&quot;
-  ) |&gt; 
+indprod_id_pk_pe_ph_sg_za &lt;- rdb(&quot;IMF&quot;, &quot;IFS&quot;, mask = &quot;M.ID+PK+PE+PH+SG+ZH.AIPMA_PC_CP_A_PT&quot;) |&gt; 
   rename(Country = `Reference Area`)
 
-indprod_ar_hk_sa_th &lt;- rdb(
-  provider_code = &quot;IMF&quot;,
-  dataset_code  = &quot;IFS&quot;,
-  mask = &quot;Q.AR+HK+SA+TH.AIPMA_PC_CP_A_PT&quot;
-  ) |&gt; 
+indprod_ar_hk_sa_th &lt;- rdb(&quot;IMF&quot;, &quot;IFS&quot;, mask = &quot;Q.AR+HK+SA+TH.AIPMA_PC_CP_A_PT&quot;) |&gt; 
   rename(Country = `Reference Area`) |&gt; 
-  mutate(
-    Country = case_when(Country == &quot;Hong Kong, China&quot; ~ &quot;Hong Kong&quot;, TRUE ~ Country)
-  )
+  mutate(Country = case_when(Country == &quot;Hong Kong, China&quot; ~ &quot;Hong Kong&quot;, TRUE ~ Country))
 
 indprod &lt;- bind_rows(
   indprod,
@@ -2182,97 +2140,57 @@ indprod &lt;- bind_rows(
   indprod_cn_eg_mx_my,
   indprod_id_pk_pe_ph_sg_za,
   indprod_ar_hk_sa_th
-)
+  )
 
 ## Consumer Price Index ----
-cpi &lt;- rdb(
-  provider_code = &quot;OECD&quot;,
-  dataset_code  = &quot;MEI&quot;,
-  ids = &quot;.CPALTT01.GY.M&quot;
-  )
+cpi &lt;- rdb(&quot;OECD&quot;, &quot;MEI&quot;, ids = &quot;.CPALTT01.GY.M&quot;)
 
-cpi_au &lt;- rdb(
-  provider_code = &quot;OECD&quot;,
-  dataset_code  = &quot;MEI&quot;,
-  ids = &quot;AUS.CPALTT01.GY.Q&quot;
-  )
+cpi_au &lt;- rdb(&quot;OECD&quot;, &quot;MEI&quot;, ids = &quot;AUS.CPALTT01.GY.Q&quot;)
 
 cpi_tw &lt;- rdb(ids = &quot;BI/TABEL9_2/17.Q&quot;) |&gt; 
   mutate(Country = &quot;Taiwan&quot;)
 
-cpi_other &lt;- rdb(
-  provider_code = &quot;IMF&quot;,
-  dataset_code  = &quot;IFS&quot;,
-  mask = &quot;M.EG+HK+MY+PE+PH+PK+SG+TH.PCPI_PC_CP_A_PT&quot;
-  ) |&gt; 
+cpi_other &lt;- rdb(&quot;IMF&quot;, &quot;IFS&quot;, mask = &quot;M.EG+HK+MY+PE+PH+PK+SG+TH.PCPI_PC_CP_A_PT&quot;) |&gt; 
   rename(Country = `Reference Area`) |&gt; 
-  mutate(
-    Country = case_when(Country == &quot;Hong Kong, China&quot; ~ &quot;Hong Kong&quot;, TRUE ~ Country)
-  )
+  mutate(Country = case_when(Country == &quot;Hong Kong, China&quot; ~ &quot;Hong Kong&quot;, TRUE ~ Country))
 
 cpi &lt;- bind_rows(
   cpi,
   cpi_au,
   cpi_tw,
   cpi_other
-)
-
-## Unemployment Rate ----
-unemp &lt;- rdb(
-  provider_code = &quot;OECD&quot;,
-  dataset_code  = &quot;MEI&quot;,
-  ids = &quot;.LRHUTTTT.STSA.M&quot;
   )
 
-unemp_ch &lt;- rdb(
-  provider_code = &quot;OECD&quot;,
-  dataset_code  = &quot;MEI&quot;,
-  mask = &quot;CHE.LMUNRRTT.STSA.M&quot;
-)
+## Unemployment Rate ----
+unemp &lt;- rdb(&quot;OECD&quot;, &quot;MEI&quot;, ids = &quot;.LRHUTTTT.STSA.M&quot;)
 
-unemp_br &lt;- rdb(
-  provider_code = &quot;OECD&quot;,
-  dataset_code  = &quot;MEI&quot;,
-  mask = &quot;BRA.LRUNTTTT.STSA.M&quot;
-)
+unemp_ch &lt;- rdb(&quot;OECD&quot;, &quot;MEI&quot;, mask = &quot;CHE.LMUNRRTT.STSA.M&quot;)
 
-unemp_za_ru &lt;- rdb(
-  provider_code = &quot;OECD&quot;,
-  dataset_code  = &quot;MEI&quot;,
-  mask = &quot;ZAF+RUS.LRUNTTTT.STSA.Q&quot;
-)
+unemp_br &lt;- rdb(&quot;OECD&quot;, &quot;MEI&quot;, mask = &quot;BRA.LRUNTTTT.STSA.M&quot;)
+
+unemp_za_ru &lt;- rdb(&quot;OECD&quot;, &quot;MEI&quot;, mask = &quot;ZAF+RUS.LRUNTTTT.STSA.Q&quot;)
 
 unemp_cn &lt;- rdb(ids = &quot;NBS/M_A0E01/A0E0101&quot;) |&gt; 
   mutate(Country = &quot;China&quot;)
 
-unemp_sa &lt;- rdb(ids = &quot;ILO/UNE_DEAP_SEX_AGE_RT/SAU.BA_627.AGE_AGGREGATE_TOTAL.SEX_T.A&quot;) |&gt; 
+unemp_sa &lt;- rdb(ids = &quot;ILO/UNE_DEAP_SEX_AGE_RT/SAU.BA_627.AGE_AGGREGATE_TOTAL.SEX_T.A&quot;) |&gt;
   rename(Country = `Reference area`) |&gt; 
   filter(year(period) &lt; current_year)
 
-unemp_in &lt;- rdb(ids = &quot;ILO/UNE_2EAP_SEX_AGE_RT/IND.XA_1976.AGE_YTHADULT_YGE15.SEX_T.A&quot;) |&gt; 
+unemp_in &lt;- rdb(ids = &quot;ILO/UNE_2EAP_SEX_AGE_RT/IND.XA_1976.AGE_YTHADULT_YGE15.SEX_T.A&quot;) |&gt;
   rename(Country = `Reference area`) |&gt; 
   filter(year(period) &lt; current_year)
 
-unemp_id_pk &lt;- rdb(
-  provider_code = &quot;ILO&quot;,
-  dataset_code  = &quot;UNE_DEAP_SEX_AGE_EDU_RT&quot;,
-  mask = &quot;IDN+PAK..AGE_AGGREGATE_TOTAL.EDU_AGGREGATE_TOTAL.SEX_T.Q&quot;
-  ) |&gt; 
+unemp_id_pk &lt;- rdb(&quot;ILO&quot;, &quot;UNE_DEAP_SEX_AGE_EDU_RT&quot;, mask = &quot;IDN+PAK..AGE_AGGREGATE_TOTAL.EDU_AGGREGATE_TOTAL.SEX_T.Q&quot;) |&gt; 
   rename(Country = `Reference area`)
 
-unemp_other &lt;- rdb(
-  provider_code = &quot;ILO&quot;,
-  dataset_code  = &quot;UNE_DEA1_SEX_AGE_RT&quot;,
-  mask = &quot;ARG+EGY+HKG+MYS+PER+PHL+SGP+THA+TWN..AGE_YTHADULT_YGE15.SEX_T.Q&quot;
-  ) |&gt; 
+unemp_other &lt;- rdb(&quot;ILO&quot;, &quot;UNE_DEA1_SEX_AGE_RT&quot;, mask = &quot;ARG+EGY+HKG+MYS+PER+PHL+SGP+THA+TWN..AGE_YTHADULT_YGE15.SEX_T.Q&quot;) |&gt; 
   rename(Country = `Reference area`) |&gt; 
-  mutate(
-    Country = case_when(
-      Country == &quot;Hong Kong, China&quot; ~ &quot;Hong Kong&quot;, 
-      Country == &quot;Taiwan, China&quot; ~ &quot;Taiwan&quot;,
-      TRUE ~ Country
-      )
-  )
+  mutate(Country = case_when(
+    Country == &quot;Hong Kong, China&quot; ~ &quot;Hong Kong&quot;, 
+    Country == &quot;Taiwan, China&quot; ~ &quot;Taiwan&quot;,
+    TRUE ~ Country
+    ))
 
 unemp &lt;- bind_rows(
   unemp,
@@ -2287,17 +2205,9 @@ unemp &lt;- bind_rows(
 )
 
 ## IMF World Economic Outlook (WEO) Forecasts ----
-forecast_gdp_cpi_ea &lt;- rdb(
-  provider_code = &quot;IMF&quot;,
-  dataset_code  = &quot;WEOAGG:latest&quot;,
-  mask = &quot;163.NGDP_RPCH+PCPIPCH&quot;
-)
+forecast_gdp_cpi_ea &lt;- rdb(&quot;IMF&quot;, &quot;WEOAGG:latest&quot;, mask = &quot;163.NGDP_RPCH+PCPIPCH&quot;)
 
-forecast_gdp_cpi &lt;- rdb(
-  provider_code = &quot;IMF&quot;,
-  dataset_code  = &quot;WEO:latest&quot;,
-  mask = &quot;.NGDP_RPCH+PCPIPCH&quot;
-  ) |&gt; 
+forecast_gdp_cpi &lt;- rdb(&quot;IMF&quot;, &quot;WEO:latest&quot;, mask = &quot;.NGDP_RPCH+PCPIPCH&quot;) |&gt; 
   bind_rows(forecast_gdp_cpi_ea) |&gt; 
   transmute(
     Country = `WEO Country`,
@@ -2327,10 +2237,10 @@ forecast_gdp_cpi &lt;- rdb(
   )
 
 forecast_gdp_cpi &lt;- left_join(
-  data.frame(Country = country_list),
-  forecast_gdp_cpi, 
+  x = data.frame(Country = country_list), 
+  y = forecast_gdp_cpi, 
   by = &quot;Country&quot;
-)</code></pre>
+  )</code></pre>
 </div>
 <div id="transform" class="section level1">
 <h1>Transform</h1>
@@ -2344,10 +2254,7 @@ gdp_yoy_latest_period &lt;- gdp |&gt;
 gdp_yoy_latest &lt;- gdp |&gt; 
   filter(MEASURE == &quot;GYSA&quot;) |&gt; 
   inner_join(gdp_yoy_latest_period, by = join_by(period)) |&gt; 
-  mutate(
-    var = &quot;GDP&quot;,
-    measure = &quot;latest&quot;
-  )
+  mutate(var = &quot;GDP&quot;, measure = &quot;latest&quot;)
 
 ### GDP QoQ ----
 gdp_qoq_latest_period &lt;- gdp |&gt; 
@@ -2359,10 +2266,7 @@ gdp_qoq_latest_period &lt;- gdp |&gt;
 gdp_qoq_latest &lt;- gdp |&gt; 
   filter(MEASURE == &quot;GPSA&quot;) |&gt; 
   inner_join(gdp_qoq_latest_period, by = join_by(Country, period)) |&gt; 
-  mutate(
-    var = &quot;GDP&quot;,
-    measure = &quot;quarter&quot;
-  )
+  mutate(var = &quot;GDP&quot;, measure = &quot;quarter&quot;)
 
 ### IMF WEO Forecasts ----
 gdp_2025_2026 &lt;- forecast_gdp_cpi |&gt; 
@@ -2377,10 +2281,7 @@ indprod_latest_period &lt;- indprod |&gt;
 
 indprod_latest &lt;- indprod |&gt; 
   inner_join(indprod_latest_period, by = join_by(Country, period)) |&gt; 
-  mutate(
-    var = &quot;indprod&quot;,
-    measure = &quot;latest&quot;
-  )
+  mutate(var = &quot;indprod&quot;, measure = &quot;latest&quot;)
 
 ## Consumer Price Index (CPI) ----
 cpi_latest_period &lt;- cpi |&gt; 
@@ -2390,10 +2291,7 @@ cpi_latest_period &lt;- cpi |&gt;
 
 cpi_latest &lt;- cpi |&gt; 
   inner_join(cpi_latest_period, by = join_by(Country, period)) |&gt; 
-  mutate(
-    var = &quot;CPI&quot;,
-    measure = &quot;latest&quot;
-  )
+  mutate(var = &quot;CPI&quot;, measure = &quot;latest&quot;)
 
 cpi_2025 &lt;- forecast_gdp_cpi |&gt; 
   filter(var == &quot;CPI&quot; &amp; period == &quot;2025-01-01&quot;) |&gt; 
@@ -2407,14 +2305,12 @@ unemp_latest_period &lt;- unemp |&gt;
 
 unemp_latest &lt;- unemp |&gt; 
   inner_join(unemp_latest_period, by = join_by(Country, period)) |&gt; 
-  mutate(
-    var = &quot;unemp&quot;,
-    measure = &quot;latest&quot;
-  )</code></pre>
+  mutate(var = &quot;unemp&quot;, measure = &quot;latest&quot;)</code></pre>
 </div>
 <div id="merge" class="section level1">
 <h1>Merge</h1>
-<pre class="r"><code>df_all &lt;- bind_rows(
+<pre class="r"><code>## Combine all data frames ----
+df_all &lt;- bind_rows(
   gdp_yoy_latest,
   gdp_qoq_latest,
   gdp_2025_2026,
@@ -2432,8 +2328,9 @@ unemp_latest &lt;- unemp |&gt;
     ) |&gt; 
   unite(measure, c(var, measure))
 
+## Select latest values -----
 df_latest &lt;- df_all |&gt; 
-  filter(measure %in% c(&quot;GDP_latest&quot;,&quot;indprod_latest&quot;,&quot;CPI_latest&quot;,&quot;unemp_latest&quot;)) |&gt; 
+  filter(measure %in% c(&quot;GDP_latest&quot;, &quot;indprod_latest&quot;, &quot;CPI_latest&quot;, &quot;unemp_latest&quot;)) |&gt; 
   mutate(
     value = case_when(
       `@frequency` == &quot;quarterly&quot; ~ paste(value, &quot; Q&quot;, quarter(period), sep = &quot;&quot;),
@@ -2459,6 +2356,7 @@ df_latest &lt;- df_all |&gt;
     )
   )
 
+## Select variables ----
 df_final &lt;- df_all |&gt; 
   filter(measure %in% c(&quot;GDP_quarter&quot;,&quot;GDP_2025&quot;,&quot;GDP_2026&quot;,&quot;CPI_2025&quot;)) |&gt; 
   bind_rows(df_latest) |&gt; 
@@ -2497,7 +2395,7 @@ names(df_final)[8] &lt;- paste0(&quot;2025&quot;, footnote_marker_symbol(2))
 names(df_final)[9] &lt;- &quot;latest&quot;
 
 
-df_table &lt;- df_final |&gt; 
+df_final |&gt; 
   knitr::kable(
     format = &quot;html&quot;,
     row.names = FALSE, 
@@ -2532,9 +2430,7 @@ df_table &lt;- df_final |&gt;
       paste0(last_year), 
       paste0(before_last_year)
       )
-    )
-
-df_table</code></pre>
+    )</code></pre>
 </div>
 
 

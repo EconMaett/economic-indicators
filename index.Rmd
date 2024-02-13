@@ -11,9 +11,6 @@ output: html_document
 ---
 
 ```{r pre, message=FALSE, warning=FALSE, echo=FALSE}
-# if (!"pacman" %in% install.packages()[, "Package"]) { install.packages("pacman", repos = "http://cran.r-project.org") }
-pkgs <- c("tidyverse", "rdbnomics", "zoo", "knitr", "kableExtra", "formattable")
-# pak::pkg_install(pkg = pkgs, ask = FALSE)
 pacman::p_load(tidyverse, rdbnomics, zoo, knitr, kableExtra, formattable)
 
 opts_chunk$set(fig.align = "center", message = FALSE, warning = FALSE)
@@ -37,29 +34,16 @@ country_list <- c(
 
 ```{r download, echo=FALSE}
 ## GDP ----
-gdp <- rdb(
-  provider_code = "OECD", 
-  dataset_code  = "MEI", 
-  ids = ".NAEXKP01.GPSA+GYSA.Q"
-)
+gdp <- rdb(provider_code = "OECD", dataset_code  = "MEI", ids = ".NAEXKP01.GPSA+GYSA.Q")
 
-gdp_level_hk_ph_th_sa_sg <- rdb(
-  provider_code = "IMF",
-  dataset_code  = "IFS",
-  mask = "Q.HK+PH+TH+SA+SG.NGDP_R_SA_XDC"
-  ) |> 
+gdp_level_hk_ph_th_sa_sg <- rdb("IMF", "IFS", mask = "Q.HK+PH+TH+SA+SG.NGDP_R_SA_XDC") |> 
   rename(Country = `Reference Area`) |> 
-  mutate(
-    Country = case_when(Country == "Hong Kong, China" ~ "Hong Kong", TRUE ~ Country)
-  )
+  mutate(Country = case_when(Country == "Hong Kong, China" ~ "Hong Kong", TRUE ~ Country))
 
 gdp_qoq_hk_ph_th_sa_sg <- gdp_level_hk_ph_th_sa_sg |> 
   arrange(Country, period) |> 
   group_by(Country) |> 
-  mutate(
-    value = (value / lag(value) - 1) * 100,
-    MEASURE = "GPSA"
-  )
+  mutate(value = (value / lag(value) - 1) * 100, MEASURE = "GPSA")
 
 gdp_yoy_hk_ph_th_sa_sg <- gdp_level_hk_ph_th_sa_sg |> 
   arrange(Country, period) |> 
@@ -73,11 +57,7 @@ gdp_my <- rdb(ids = "BI/TABEL9_1/21.Q") |>
 gdp_tw <- rdb(ids = "BI/TABEL9_1/17.Q") |> 
   mutate(Country = "Taiwan", MEASURE = "GYSA")
 
-gdp_eg_pk_pe <- rdb(
-  provider_code = "IMF", 
-  dataset_code  = "WEO:latest", 
-  mask = "EGY+PAK+PER.NGDP_RPCH"
-  ) |> 
+gdp_eg_pk_pe <- rdb("IMF", "WEO:latest", mask = "EGY+PAK+PER.NGDP_RPCH") |> 
   rename(Country = `WEO Country`) |> 
   mutate(MEASURE = "GYSA") |> 
   filter(year(period) < current_year)
@@ -107,41 +87,19 @@ gdp <- bind_rows(
 )
 
 ## Industrial Production ----
-indprod <- rdb(
-  provider_code = "OECD",
-  dataset_code  = "MEI",
-  ids = ".PRINTO01.GYSA.M"
-)
+indprod <- rdb("OECD", "MEI", ".PRINTO01.GYSA.M")
 
-indprod_ch_au <- rdb(
-  provider_code = "OECD",
-  dataset_code  = "MEI",
-  ids = "AUS+CHE.PRINTO01.GYSA.Q"
-  )
+indprod_ch_au <- rdb("OECD", "MEI", "AUS+CHE.PRINTO01.GYSA.Q")
 
-indprod_cn_eg_mx_my <- rdb(
-  provider_code = "IMF",
-  dataset_code  = "IFS",
-  mask = "M.CN+EG+MX+MY.AIP_PC_CP_A_PT"
-  ) |> 
+indprod_cn_eg_mx_my <- rdb("IMF", "IFS", mask = "M.CN+EG+MX+MY.AIP_PC_CP_A_PT") |> 
   rename(Country = `Reference Area`)
 
-indprod_id_pk_pe_ph_sg_za <- rdb(
-  provider_code = "IMF",
-  dataset_code  = "IFS",
-  mask = "M.ID+PK+PE+PH+SG+ZH.AIPMA_PC_CP_A_PT"
-  ) |> 
+indprod_id_pk_pe_ph_sg_za <- rdb("IMF", "IFS", mask = "M.ID+PK+PE+PH+SG+ZH.AIPMA_PC_CP_A_PT") |> 
   rename(Country = `Reference Area`)
 
-indprod_ar_hk_sa_th <- rdb(
-  provider_code = "IMF",
-  dataset_code  = "IFS",
-  mask = "Q.AR+HK+SA+TH.AIPMA_PC_CP_A_PT"
-  ) |> 
+indprod_ar_hk_sa_th <- rdb("IMF", "IFS", mask = "Q.AR+HK+SA+TH.AIPMA_PC_CP_A_PT") |> 
   rename(Country = `Reference Area`) |> 
-  mutate(
-    Country = case_when(Country == "Hong Kong, China" ~ "Hong Kong", TRUE ~ Country)
-  )
+  mutate(Country = case_when(Country == "Hong Kong, China" ~ "Hong Kong", TRUE ~ Country))
 
 indprod <- bind_rows(
   indprod,
@@ -149,97 +107,57 @@ indprod <- bind_rows(
   indprod_cn_eg_mx_my,
   indprod_id_pk_pe_ph_sg_za,
   indprod_ar_hk_sa_th
-)
+  )
 
 ## Consumer Price Index ----
-cpi <- rdb(
-  provider_code = "OECD",
-  dataset_code  = "MEI",
-  ids = ".CPALTT01.GY.M"
-  )
+cpi <- rdb("OECD", "MEI", ids = ".CPALTT01.GY.M")
 
-cpi_au <- rdb(
-  provider_code = "OECD",
-  dataset_code  = "MEI",
-  ids = "AUS.CPALTT01.GY.Q"
-  )
+cpi_au <- rdb("OECD", "MEI", ids = "AUS.CPALTT01.GY.Q")
 
 cpi_tw <- rdb(ids = "BI/TABEL9_2/17.Q") |> 
   mutate(Country = "Taiwan")
 
-cpi_other <- rdb(
-  provider_code = "IMF",
-  dataset_code  = "IFS",
-  mask = "M.EG+HK+MY+PE+PH+PK+SG+TH.PCPI_PC_CP_A_PT"
-  ) |> 
+cpi_other <- rdb("IMF", "IFS", mask = "M.EG+HK+MY+PE+PH+PK+SG+TH.PCPI_PC_CP_A_PT") |> 
   rename(Country = `Reference Area`) |> 
-  mutate(
-    Country = case_when(Country == "Hong Kong, China" ~ "Hong Kong", TRUE ~ Country)
-  )
+  mutate(Country = case_when(Country == "Hong Kong, China" ~ "Hong Kong", TRUE ~ Country))
 
 cpi <- bind_rows(
   cpi,
   cpi_au,
   cpi_tw,
   cpi_other
-)
-
-## Unemployment Rate ----
-unemp <- rdb(
-  provider_code = "OECD",
-  dataset_code  = "MEI",
-  ids = ".LRHUTTTT.STSA.M"
   )
 
-unemp_ch <- rdb(
-  provider_code = "OECD",
-  dataset_code  = "MEI",
-  mask = "CHE.LMUNRRTT.STSA.M"
-)
+## Unemployment Rate ----
+unemp <- rdb("OECD", "MEI", ids = ".LRHUTTTT.STSA.M")
 
-unemp_br <- rdb(
-  provider_code = "OECD",
-  dataset_code  = "MEI",
-  mask = "BRA.LRUNTTTT.STSA.M"
-)
+unemp_ch <- rdb("OECD", "MEI", mask = "CHE.LMUNRRTT.STSA.M")
 
-unemp_za_ru <- rdb(
-  provider_code = "OECD",
-  dataset_code  = "MEI",
-  mask = "ZAF+RUS.LRUNTTTT.STSA.Q"
-)
+unemp_br <- rdb("OECD", "MEI", mask = "BRA.LRUNTTTT.STSA.M")
+
+unemp_za_ru <- rdb("OECD", "MEI", mask = "ZAF+RUS.LRUNTTTT.STSA.Q")
 
 unemp_cn <- rdb(ids = "NBS/M_A0E01/A0E0101") |> 
   mutate(Country = "China")
 
-unemp_sa <- rdb(ids = "ILO/UNE_DEAP_SEX_AGE_RT/SAU.BA_627.AGE_AGGREGATE_TOTAL.SEX_T.A") |> 
+unemp_sa <- rdb(ids = "ILO/UNE_DEAP_SEX_AGE_RT/SAU.BA_627.AGE_AGGREGATE_TOTAL.SEX_T.A") |>
   rename(Country = `Reference area`) |> 
   filter(year(period) < current_year)
 
-unemp_in <- rdb(ids = "ILO/UNE_2EAP_SEX_AGE_RT/IND.XA_1976.AGE_YTHADULT_YGE15.SEX_T.A") |> 
+unemp_in <- rdb(ids = "ILO/UNE_2EAP_SEX_AGE_RT/IND.XA_1976.AGE_YTHADULT_YGE15.SEX_T.A") |>
   rename(Country = `Reference area`) |> 
   filter(year(period) < current_year)
 
-unemp_id_pk <- rdb(
-  provider_code = "ILO",
-  dataset_code  = "UNE_DEAP_SEX_AGE_EDU_RT",
-  mask = "IDN+PAK..AGE_AGGREGATE_TOTAL.EDU_AGGREGATE_TOTAL.SEX_T.Q"
-  ) |> 
+unemp_id_pk <- rdb("ILO", "UNE_DEAP_SEX_AGE_EDU_RT", mask = "IDN+PAK..AGE_AGGREGATE_TOTAL.EDU_AGGREGATE_TOTAL.SEX_T.Q") |> 
   rename(Country = `Reference area`)
 
-unemp_other <- rdb(
-  provider_code = "ILO",
-  dataset_code  = "UNE_DEA1_SEX_AGE_RT",
-  mask = "ARG+EGY+HKG+MYS+PER+PHL+SGP+THA+TWN..AGE_YTHADULT_YGE15.SEX_T.Q"
-  ) |> 
+unemp_other <- rdb("ILO", "UNE_DEA1_SEX_AGE_RT", mask = "ARG+EGY+HKG+MYS+PER+PHL+SGP+THA+TWN..AGE_YTHADULT_YGE15.SEX_T.Q") |> 
   rename(Country = `Reference area`) |> 
-  mutate(
-    Country = case_when(
-      Country == "Hong Kong, China" ~ "Hong Kong", 
-      Country == "Taiwan, China" ~ "Taiwan",
-      TRUE ~ Country
-      )
-  )
+  mutate(Country = case_when(
+    Country == "Hong Kong, China" ~ "Hong Kong", 
+    Country == "Taiwan, China" ~ "Taiwan",
+    TRUE ~ Country
+    ))
 
 unemp <- bind_rows(
   unemp,
@@ -254,17 +172,9 @@ unemp <- bind_rows(
 )
 
 ## IMF World Economic Outlook (WEO) Forecasts ----
-forecast_gdp_cpi_ea <- rdb(
-  provider_code = "IMF",
-  dataset_code  = "WEOAGG:latest",
-  mask = "163.NGDP_RPCH+PCPIPCH"
-)
+forecast_gdp_cpi_ea <- rdb("IMF", "WEOAGG:latest", mask = "163.NGDP_RPCH+PCPIPCH")
 
-forecast_gdp_cpi <- rdb(
-  provider_code = "IMF",
-  dataset_code  = "WEO:latest",
-  mask = ".NGDP_RPCH+PCPIPCH"
-  ) |> 
+forecast_gdp_cpi <- rdb("IMF", "WEO:latest", mask = ".NGDP_RPCH+PCPIPCH") |> 
   bind_rows(forecast_gdp_cpi_ea) |> 
   transmute(
     Country = `WEO Country`,
@@ -294,10 +204,10 @@ forecast_gdp_cpi <- rdb(
   )
 
 forecast_gdp_cpi <- left_join(
-  data.frame(Country = country_list),
-  forecast_gdp_cpi, 
+  x = data.frame(Country = country_list), 
+  y = forecast_gdp_cpi, 
   by = "Country"
-)
+  )
 ```
 
 
@@ -312,10 +222,7 @@ gdp_yoy_latest_period <- gdp |>
 gdp_yoy_latest <- gdp |> 
   filter(MEASURE == "GYSA") |> 
   inner_join(gdp_yoy_latest_period, by = join_by(period)) |> 
-  mutate(
-    var = "GDP",
-    measure = "latest"
-  )
+  mutate(var = "GDP", measure = "latest")
 
 ### GDP QoQ ----
 gdp_qoq_latest_period <- gdp |> 
@@ -327,10 +234,7 @@ gdp_qoq_latest_period <- gdp |>
 gdp_qoq_latest <- gdp |> 
   filter(MEASURE == "GPSA") |> 
   inner_join(gdp_qoq_latest_period, by = join_by(Country, period)) |> 
-  mutate(
-    var = "GDP",
-    measure = "quarter"
-  )
+  mutate(var = "GDP", measure = "quarter")
 
 ### IMF WEO Forecasts ----
 gdp_2025_2026 <- forecast_gdp_cpi |> 
@@ -345,10 +249,7 @@ indprod_latest_period <- indprod |>
 
 indprod_latest <- indprod |> 
   inner_join(indprod_latest_period, by = join_by(Country, period)) |> 
-  mutate(
-    var = "indprod",
-    measure = "latest"
-  )
+  mutate(var = "indprod", measure = "latest")
 
 ## Consumer Price Index (CPI) ----
 cpi_latest_period <- cpi |> 
@@ -358,10 +259,7 @@ cpi_latest_period <- cpi |>
 
 cpi_latest <- cpi |> 
   inner_join(cpi_latest_period, by = join_by(Country, period)) |> 
-  mutate(
-    var = "CPI",
-    measure = "latest"
-  )
+  mutate(var = "CPI", measure = "latest")
 
 cpi_2025 <- forecast_gdp_cpi |> 
   filter(var == "CPI" & period == "2025-01-01") |> 
@@ -375,14 +273,12 @@ unemp_latest_period <- unemp |>
 
 unemp_latest <- unemp |> 
   inner_join(unemp_latest_period, by = join_by(Country, period)) |> 
-  mutate(
-    var = "unemp",
-    measure = "latest"
-  )
+  mutate(var = "unemp", measure = "latest")
 ```
 
 
 ```{r merge, echo=FALSE}
+## Combine all data frames ----
 df_all <- bind_rows(
   gdp_yoy_latest,
   gdp_qoq_latest,
@@ -401,8 +297,9 @@ df_all <- bind_rows(
     ) |> 
   unite(measure, c(var, measure))
 
+## Select latest values -----
 df_latest <- df_all |> 
-  filter(measure %in% c("GDP_latest","indprod_latest","CPI_latest","unemp_latest")) |> 
+  filter(measure %in% c("GDP_latest", "indprod_latest", "CPI_latest", "unemp_latest")) |> 
   mutate(
     value = case_when(
       `@frequency` == "quarterly" ~ paste(value, " Q", quarter(period), sep = ""),
@@ -428,6 +325,7 @@ df_latest <- df_all |>
     )
   )
 
+## Select variables ----
 df_final <- df_all |> 
   filter(measure %in% c("GDP_quarter","GDP_2025","GDP_2026","CPI_2025")) |> 
   bind_rows(df_latest) |> 
@@ -467,15 +365,15 @@ names(df_final)[8] <- paste0("2025", footnote_marker_symbol(2))
 names(df_final)[9] <- "latest"
 
 
-df_table <- df_final |> 
-  knitr::kable(
+df_final |> 
+  kable(
     format = "html",
     row.names = FALSE, 
     escape = FALSE, 
     align = c("l", rep("c", 8)), 
     caption = "Economic data (% change on year ago)"
     ) |> 
-  kableExtra::kable_styling(
+  kable_styling(
     bootstrap_options = c("striped", "hover", "responsive"), 
     fixed_thead = TRUE, 
     font_size = 13
@@ -503,8 +401,6 @@ df_table <- df_final |>
       paste0(before_last_year)
       )
     )
-
-df_table
 ```
 
 <br>
