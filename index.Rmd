@@ -25,7 +25,7 @@ before_last_year <- current_year - 2
 country_list <- c(
   "United States", "China", "Japan", "Britain", "Canada", 
   "Euro area", "Austria", "Belgium", "France", "Germany", "Greece", 
-  "Italy", "Netherlands", "Spain", "Czechia", 
+  "Italy", "Netherlands", "Spain", "Czech Republic", 
   "Denmark", "Norway", "Poland", "Russia", "Sweden", "Switzerland", "Türkiye", 
   "Australia", "Hong Kong", "India", "Indonesia", "Malaysia",
   "Pakistan", "Philippines", "Singapore", "South Korea", "Taiwan", "Thailand", 
@@ -36,6 +36,7 @@ country_list <- c(
 
 
 ```{r download, echo=FALSE}
+## GDP ----
 gdp <- rdb(
   provider_code = "OECD", 
   dataset_code  = "MEI", 
@@ -105,6 +106,7 @@ gdp <- bind_rows(
   gdp_yoy_ar
 )
 
+## Industrial Production ----
 indprod <- rdb(
   provider_code = "OECD",
   dataset_code  = "MEI",
@@ -149,6 +151,7 @@ indprod <- bind_rows(
   indprod_ar_hk_sa_th
 )
 
+## Consumer Price Index ----
 cpi <- rdb(
   provider_code = "OECD",
   dataset_code  = "MEI",
@@ -181,6 +184,7 @@ cpi <- bind_rows(
   cpi_other
 )
 
+## Unemployment Rate ----
 unemp <- rdb(
   provider_code = "OECD",
   dataset_code  = "MEI",
@@ -249,6 +253,7 @@ unemp <- bind_rows(
   unemp_other
 )
 
+## IMF World Economic Outlook (WEO) Forecasts ----
 forecast_gdp_cpi_ea <- rdb(
   provider_code = "IMF",
   dataset_code  = "WEOAGG:latest",
@@ -274,7 +279,7 @@ forecast_gdp_cpi <- rdb(
   mutate(
     Country = case_when(
       Country == "Turkey" ~ "Türkiye",
-      Country == "Czech Republic" ~ "Czechia",
+      Country == "Czechia" ~ "Czech Republic",
       Country == "United Kingdom" ~ "Britain",
       Country == "Hong Kong SAR" ~ "Hong Kong",
       Country == "Korea" ~ "South Korea",
@@ -293,11 +298,12 @@ forecast_gdp_cpi <- left_join(
   forecast_gdp_cpi, 
   by = "Country"
 )
-
 ```
 
 
 ```{r transform, echo=FALSE}
+## Gross Domestic Product (GDP) ----
+### GDP YoY ----
 gdp_yoy_latest_period <- gdp |> 
   filter(MEASURE == "GYSA") |> 
   filter(!is.na(value)) |> 
@@ -311,6 +317,7 @@ gdp_yoy_latest <- gdp |>
     measure = "latest"
   )
 
+### GDP QoQ ----
 gdp_qoq_latest_period <- gdp |> 
   filter(MEASURE == "GPSA") |> 
   filter(!is.na(value)) |> 
@@ -325,10 +332,12 @@ gdp_qoq_latest <- gdp |>
     measure = "quarter"
   )
 
+### IMF WEO Forecasts ----
 gdp_2025_2026 <- forecast_gdp_cpi |> 
   filter(var == "GDP" & (period == "2025-01-01" | period == "2026-01-01")) |> 
   mutate(measure = as.character(year(period)))
 
+## Industrial Production ----
 indprod_latest_period <- indprod |> 
   filter(!is.na(value)) |> 
   group_by(Country) |> 
@@ -341,6 +350,7 @@ indprod_latest <- indprod |>
     measure = "latest"
   )
 
+## Consumer Price Index (CPI) ----
 cpi_latest_period <- cpi |> 
   filter(!is.na(value)) |> 
   group_by(Country) |> 
@@ -357,6 +367,7 @@ cpi_2025 <- forecast_gdp_cpi |>
   filter(var == "CPI" & period == "2025-01-01") |> 
   mutate(measure = as.character(year(period)))
 
+## Unemployment Rate ----
 unemp_latest_period <- unemp |> 
   filter(!is.na(value)) |> 
   group_by(Country) |> 
@@ -410,13 +421,7 @@ df_latest <- df_all |>
         false = value
         )
       ),
-    link = paste(
-      "https://db.nomics.world", 
-      provider_code, 
-      dataset_code, 
-      series_code, 
-      sep = "/"
-      ), 
+    link = paste("https://db.nomics.world", provider_code, dataset_code, series_code, sep = "/"), 
     color = "#333333",
     escape = FALSE, 
     extra_css = "text-decoration:none"
@@ -429,7 +434,7 @@ df_final <- df_all |>
   mutate(
     Country = case_when(
       Country == "Turkey" ~ "Türkiye",
-      Country == "Czech Republic" ~ "Czechia",
+      Country == "Czechia" ~ "Czech Republic",
       Country == "United Kingdom" ~ "Britain",
       Country == "Euro area (20 countries)" ~ "Euro area",
       Country == "China (People's Republic of)" ~ "China",
