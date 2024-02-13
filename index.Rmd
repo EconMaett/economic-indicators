@@ -25,7 +25,7 @@ before_last_year <- current_year - 2
 country_list <- c(
   "United States", "China", "Japan", "Britain", "Canada", 
   "Euro area", "Austria", "Belgium", "France", "Germany", "Greece", 
-  "Italy", "Netherlands", "Spain", "Czech Republic", 
+  "Italy", "Netherlands", "Spain", "Czechia", 
   "Denmark", "Norway", "Poland", "Russia", "Sweden", "Switzerland", "Türkiye", 
   "Australia", "Hong Kong", "India", "Indonesia", "Malaysia",
   "Pakistan", "Philippines", "Singapore", "South Korea", "Taiwan", "Thailand", 
@@ -273,6 +273,8 @@ forecast_gdp_cpi <- rdb(
   ) |> 
   mutate(
     Country = case_when(
+      Country == "Turkey" ~ "Türkiye",
+      Country == "Czech Republic" ~ "Czechia",
       Country == "United Kingdom" ~ "Britain",
       Country == "Hong Kong SAR" ~ "Hong Kong",
       Country == "Korea" ~ "South Korea",
@@ -426,6 +428,8 @@ df_final <- df_all |>
   bind_rows(df_latest) |> 
   mutate(
     Country = case_when(
+      Country == "Turkey" ~ "Türkiye",
+      Country == "Czech Republic" ~ "Czechia",
       Country == "United Kingdom" ~ "Britain",
       Country == "Euro area (20 countries)" ~ "Euro area",
       Country == "China (People's Republic of)" ~ "China",

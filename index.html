@@ -1095,13 +1095,14 @@ Dec<sup>‡</sup></a>
 </tr>
 <tr>
 <td style="text-align:left;font-weight: bold;background-color: rgba(213, 228, 235, 255) !important;">
-Czech Republic
+Czechia
 </td>
 <td style="text-align:center;background-color: rgba(213, 228, 235, 255) !important;">
-NA
+<a href="https://db.nomics.world/OECD/MEI/CZE.NAEXKP01.GYSA.Q" style="     color: rgba(51, 51, 51, 255) !important;text-decoration:none">-0.2
+Q4<sup>‡</sup></a>
 </td>
 <td style="text-align:center;background-color: rgba(213, 228, 235, 255) !important;">
-NA
++0.2
 </td>
 <td style="text-align:center;background-color: rgba(213, 228, 235, 255) !important;">
 +2.9
@@ -1110,16 +1111,19 @@ NA
 +2.7
 </td>
 <td style="text-align:center;background-color: rgba(213, 228, 235, 255) !important;">
-NA
+<a href="https://db.nomics.world/OECD/MEI/CZE.PRINTO01.GYSA.M" style="     color: rgba(51, 51, 51, 255) !important;text-decoration:none">-2.7
+Nov<sup>‡</sup></a>
 </td>
 <td style="text-align:center;background-color: rgba(213, 228, 235, 255) !important;">
-NA
+<a href="https://db.nomics.world/OECD/MEI/CZE.CPALTT01.GY.M" style="     color: rgba(51, 51, 51, 255) !important;text-decoration:none">+6.9
+Dec<sup>‡</sup></a>
 </td>
 <td style="text-align:center;background-color: rgba(213, 228, 235, 255) !important;">
 +2.1
 </td>
 <td style="text-align:center;background-color: rgba(213, 228, 235, 255) !important;">
-NA
+<a href="https://db.nomics.world/OECD/MEI/CZE.LRHUTTTT.STSA.M" style="     color: rgba(51, 51, 51, 255) !important;text-decoration:none">+2.8
+Dec<sup>‡</sup></a>
 </td>
 </tr>
 <tr>
@@ -2056,7 +2060,7 @@ before_last_year &lt;- current_year - 2
 country_list &lt;- c(
   &quot;United States&quot;, &quot;China&quot;, &quot;Japan&quot;, &quot;Britain&quot;, &quot;Canada&quot;, 
   &quot;Euro area&quot;, &quot;Austria&quot;, &quot;Belgium&quot;, &quot;France&quot;, &quot;Germany&quot;, &quot;Greece&quot;, 
-  &quot;Italy&quot;, &quot;Netherlands&quot;, &quot;Spain&quot;, &quot;Czech Republic&quot;, 
+  &quot;Italy&quot;, &quot;Netherlands&quot;, &quot;Spain&quot;, &quot;Czechia&quot;, 
   &quot;Denmark&quot;, &quot;Norway&quot;, &quot;Poland&quot;, &quot;Russia&quot;, &quot;Sweden&quot;, &quot;Switzerland&quot;, &quot;Türkiye&quot;, 
   &quot;Australia&quot;, &quot;Hong Kong&quot;, &quot;India&quot;, &quot;Indonesia&quot;, &quot;Malaysia&quot;,
   &quot;Pakistan&quot;, &quot;Philippines&quot;, &quot;Singapore&quot;, &quot;South Korea&quot;, &quot;Taiwan&quot;, &quot;Thailand&quot;, 
@@ -2302,6 +2306,8 @@ forecast_gdp_cpi &lt;- rdb(
   ) |&gt; 
   mutate(
     Country = case_when(
+      Country == &quot;Turkey&quot; ~ &quot;Türkiye&quot;,
+      Country == &quot;Czech Republic&quot; ~ &quot;Czechia&quot;,
       Country == &quot;United Kingdom&quot; ~ &quot;Britain&quot;,
       Country == &quot;Hong Kong SAR&quot; ~ &quot;Hong Kong&quot;,
       Country == &quot;Korea&quot; ~ &quot;South Korea&quot;,
@@ -2452,6 +2458,8 @@ df_final &lt;- df_all |&gt;
   bind_rows(df_latest) |&gt; 
   mutate(
     Country = case_when(
+      Country == &quot;Turkey&quot; ~ &quot;Türkiye&quot;,
+      Country == &quot;Czech Republic&quot; ~ &quot;Czechia&quot;,
       Country == &quot;United Kingdom&quot; ~ &quot;Britain&quot;,
       Country == &quot;Euro area (20 countries)&quot; ~ &quot;Euro area&quot;,
       Country == &quot;China (People&#39;s Republic of)&quot; ~ &quot;China&quot;,
