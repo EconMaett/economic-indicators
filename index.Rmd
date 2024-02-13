@@ -5,8 +5,8 @@ category: Economic Indicators
 tags: DBnomics, database, R, 
 slug: economic-indicators
 authors: EconMaett
-summary: We reproduce part of the economic indicators table from 'The Economist' using DBnomics.
-download: https://git.nomics.world/macro/indicators
+summary: Reproduction of parts of the economic indicator tables from 'The Economist' using DBnomics.
+download: https://github.com/EconMaett/economic-indicators
 output: html_document
 ---
 
@@ -26,7 +26,7 @@ country_list <- c(
   "United States", "China", "Japan", "Britain", "Canada", 
   "Euro area", "Austria", "Belgium", "France", "Germany", "Greece", 
   "Italy", "Netherlands", "Spain", "Czech Republic", 
-  "Denmark", "Norway", "Poland", "Russia", "Sweden", "Switzerland", "Turkey", 
+  "Denmark", "Norway", "Poland", "Russia", "Sweden", "Switzerland", "Türkiye", 
   "Australia", "Hong Kong", "India", "Indonesia", "Malaysia",
   "Pakistan", "Philippines", "Singapore", "South Korea", "Taiwan", "Thailand", 
   "Argentina", "Brazil", "Chile", "Colombia", "Mexico", "Peru",
@@ -186,7 +186,6 @@ unemp <- rdb(
   dataset_code  = "MEI",
   ids = ".LRHUTTTT.STSA.M"
   )
-  
 
 unemp_ch <- rdb(
   provider_code = "OECD",
@@ -324,8 +323,8 @@ gdp_qoq_latest <- gdp |>
     measure = "quarter"
   )
 
-gdp_2024_2025 <- forecast_gdp_cpi |> 
-  filter(var == "GDP" & (period == "2024-01-01" | period == "2025-01-01")) |> 
+gdp_2025_2026 <- forecast_gdp_cpi |> 
+  filter(var == "GDP" & (period == "2025-01-01" | period == "2026-01-01")) |> 
   mutate(measure = as.character(year(period)))
 
 indprod_latest_period <- indprod |> 
@@ -352,8 +351,8 @@ cpi_latest <- cpi |>
     measure = "latest"
   )
 
-cpi_2024 <- forecast_gdp_cpi |> 
-  filter(var == "CPI" & period == "2024-01-01") |> 
+cpi_2025 <- forecast_gdp_cpi |> 
+  filter(var == "CPI" & period == "2025-01-01") |> 
   mutate(measure = as.character(year(period)))
 
 unemp_latest_period <- unemp |> 
@@ -374,10 +373,10 @@ unemp_latest <- unemp |>
 df_all <- bind_rows(
   gdp_yoy_latest,
   gdp_qoq_latest,
-  gdp_2024_2025,
+  gdp_2025_2026,
   indprod_latest,
   cpi_latest,
-  cpi_2024,
+  cpi_2025,
   unemp_latest
   ) |> 
   mutate(
@@ -389,9 +388,8 @@ df_all <- bind_rows(
     ) |> 
   unite(measure, c(var, measure))
 
-
 df_latest <- df_all |> 
-  filter(measure %in% c("GDP_latest", "indprod_latest", "CPI_latest", "unemp_latest")) |> 
+  filter(measure %in% c("GDP_latest","indprod_latest","CPI_latest","unemp_latest")) |> 
   mutate(
     value = case_when(
       `@frequency` == "quarterly" ~ paste(value, " Q", quarter(period), sep = ""),
@@ -424,7 +422,7 @@ df_latest <- df_all |>
   )
 
 df_final <- df_all |> 
-  filter(measure %in% c("GDP_quarter", "GDP_2024", "GDP_2025", "CPI_2024")) |> 
+  filter(measure %in% c("GDP_quarter","GDP_2025","GDP_2026","CPI_2025")) |> 
   bind_rows(df_latest) |> 
   mutate(
     Country = case_when(
@@ -437,7 +435,7 @@ df_final <- df_all |>
   ) |> 
   select(Country, value, measure) |> 
   spread(measure, value) |> 
-  select(Country, GDP_latest, GDP_quarter, GDP_2024, GDP_2025, indprod_latest, CPI_latest, CPI_2024, unemp_latest)
+  select(Country, GDP_latest, GDP_quarter, GDP_2025, GDP_2026, indprod_latest, CPI_latest, CPI_2025, unemp_latest)
 
 
 df_final <- left_join(
@@ -452,11 +450,11 @@ df_final <- left_join(
 names(df_final)[1] <- ""
 names(df_final)[2] <- "latest"
 names(df_final)[3] <- paste0("quarter", footnote_marker_symbol(1))
-names(df_final)[4] <- paste0("2024", footnote_marker_symbol(2))
-names(df_final)[5] <- paste0("2025", footnote_marker_symbol(2))
+names(df_final)[4] <- paste0("2025", footnote_marker_symbol(2))
+names(df_final)[5] <- paste0("2026", footnote_marker_symbol(2))
 names(df_final)[6] <- "latest"
 names(df_final)[7] <- "latest"
-names(df_final)[8] <- paste0("2024", footnote_marker_symbol(2))
+names(df_final)[8] <- paste0("2025", footnote_marker_symbol(2))
 names(df_final)[9] <- "latest"
 
 
@@ -503,7 +501,7 @@ df_table
 <br>
 <br>
 
-The aim of this blog post is to reproduce part of the economic indicators table from <a href="https://www.economist.com/economic-and-financial-indicators/2025/02/08/economic-data-commodities-and-markets" target="_blank">'The Economist'</a> using only free tools. We take data directly from <a href="https://db.nomics.world/" target="_blank">DBnomics</a>. The DBnomics API can be accessed through R with the <a href="https://cran.r-project.org/web/packages/rdbnomics/index.html" target="_blank">rdbnomics</a> package. All the following code is written in R, thanks to the [@Rct16] and the [@RStu16]. To update the table, just download the code <a href="https://git.nomics.world/macro/indicators" target="_blank">here</a> and re-run it.
+This page reproduces parts of the economic indicators table from <a href="https://www.economist.com/economic-and-financial-indicators/2024/02/08/economic-data-commodities-and-markets">'The Economist'</a> using only free tools. Economic data is retrieved from <a href="https://db.nomics.world/" target="_blank">DBnomics</a>.
 
 ```{r pre, eval=FALSE}
 ```
