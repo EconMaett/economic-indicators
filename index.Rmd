@@ -407,22 +407,3 @@ df_final |>
 <br>
 
 This page reproduces parts of the economic indicators table from <a href="https://www.economist.com/economic-and-financial-indicators/2024/02/08/economic-data-commodities-and-markets">'The Economist'</a> using only free tools. Economic data is retrieved from <a href="https://db.nomics.world/" target="_blank">DBnomics</a>.
-
-```{r pre, eval=FALSE}
-```
-
-# Download
-```{r download, eval=FALSE}
-```
-
-# Transform
-```{r transform, eval=FALSE}
-```
-
-# Merge
-```{r merge, eval=FALSE}
-```
-
-# Display
-```{r display, eval=FALSE}
-```
