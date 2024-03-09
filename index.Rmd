@@ -34,7 +34,7 @@ country_list <- c(
 
 ```{r download, echo=FALSE}
 ## GDP ----
-gdp <- rdb(provider_code = "OECD", dataset_code  = "MEI", ids = ".NAEXKP01.GPSA+GYSA.Q")
+gdp <- rdb("OECD", "MEI", ids = ".NAEXKP01.GPSA+GYSA.Q")
 
 gdp_level_hk_ph_th_sa_sg <- rdb("IMF", "IFS", mask = "Q.HK+PH+TH+SA+SG.NGDP_R_SA_XDC") |> 
   rename(Country = `Reference Area`) |> 
@@ -176,11 +176,12 @@ forecast_gdp_cpi_ea <- rdb("IMF", "WEOAGG:latest", mask = "163.NGDP_RPCH+PCPIPCH
 
 forecast_gdp_cpi <- rdb("IMF", "WEO:latest", mask = ".NGDP_RPCH+PCPIPCH") |> 
   bind_rows(forecast_gdp_cpi_ea) |> 
-  transmute(
+  mutate(
     Country = `WEO Country`,
     var = `WEO Subject`,
     value,
-    period
+    period,
+    .keep = "none"
     ) |> 
   mutate(
     Country = str_trim(Country),
